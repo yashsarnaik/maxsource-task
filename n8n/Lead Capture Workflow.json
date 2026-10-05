@@ -1,0 +1,292 @@
+{
+  "name": "Lead Capture Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5483e521-d7f3-45b5-a48b-f88928e7c0b9",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        64
+      ],
+      "webhookId": "lead-capture-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "check-secret",
+              "leftValue": "={{ $json.headers[\"x-webhook-secret\"] }}",
+              "rightValue": "=M@XSOURCE123",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "940a9c55-9aa1-41ac-8ce8-ec45c581d109",
+      "name": "Check Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a-first",
+              "name": "first_name",
+              "type": "string",
+              "value": "={{ $json.body.first_name }}"
+            },
+            {
+              "id": "a-last",
+              "name": "last_name",
+              "type": "string",
+              "value": "={{ $json.body.last_name }}"
+            },
+            {
+              "id": "a-email",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "id": "a-phone",
+              "name": "phone",
+              "type": "string",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "id": "a-company",
+              "name": "company",
+              "type": "string",
+              "value": "={{ $json.body.company }}"
+            },
+            {
+              "id": "a-message",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.body.message }}"
+            },
+            {
+              "id": "a-received",
+              "name": "received_at",
+              "type": "string",
+              "value": "={{ $now }}"
+            },
+            {
+              "id": "808fb499-c582-45a2-a001-924a2ac554f2",
+              "name": "lead_id",
+              "value": "={{ $json.body.lead_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "634cbfc3-209b-49b8-8b92-420ec3718c2e",
+      "name": "Normalize Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Lead received' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "beac2e10-adb1-45af-a7b2-bce841597224",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, message: 'Unauthorized' }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "0f26426f-bf90-4799-8391-a7c9e52eb822",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer re_iGk6oube_45KTTmh3cpauFtEoWDtrm69x"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"Yash <yash@yashsarnaik.in>\",\n  \"to\": [\n    \"yashsarnaik2303@gmail.com\"\n  ],\n  \"subject\": \"New lead received\",\n  \"html\": \"<!DOCTYPE html> <html lang=\\\"en\\\"> <head> <meta charset=\\\"UTF-8\\\"> <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1.0\\\"> <title>New Lead Received</title> </head> <body style=\\\"margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;\\\"> <table role=\\\"presentation\\\" width=\\\"100%\\\" cellpadding=\\\"0\\\" cellspacing=\\\"0\\\" border=\\\"0\\\" style=\\\"background-color:#f4f6f8;padding:24px 0;\\\"> <tr> <td align=\\\"center\\\"> <table role=\\\"presentation\\\" width=\\\"600\\\" cellpadding=\\\"0\\\" cellspacing=\\\"0\\\" border=\\\"0\\\" style=\\\"max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;\\\"> <tr> <td style=\\\"background-color:#1f4fd8;padding:24px 32px;\\\"> <p style=\\\"margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#c9d6ff;\\\">onPoint Software Services</p> <h1 style=\\\"margin:6px 0 0;font-size:22px;color:#ffffff;font-weight:bold;\\\">New Lead Received</h1> </td> </tr> <tr> <td style=\\\"padding:24px 32px 8px;\\\"> <p style=\\\"margin:0;font-size:15px;line-height:22px;color:#333333;\\\"> A new lead has just come in. Details below. </p> </td> </tr> <tr> <td style=\\\"padding:8px 32px 24px;\\\"> <table role=\\\"presentation\\\" width=\\\"100%\\\" cellpadding=\\\"0\\\" cellspacing=\\\"0\\\" border=\\\"0\\\" style=\\\"font-size:14px;color:#333333;\\\"> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;width:35%;color:#6b7785;\\\">Lead ID</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;font-weight:bold;word-break:break-all;\\\">{{ $json.lead_id }}</td> </tr> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;color:#6b7785;\\\">Name</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;font-weight:bold;\\\">{{ $json.first_name }} {{ $json.last_name }}</td> </tr> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;color:#6b7785;\\\">Email</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;\\\"> <a href=\\\"mailto:{{ $json.email }}\\\" style=\\\"color:#1f4fd8;text-decoration:none;\\\">{{ $json.email }}</a> </td> </tr> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;color:#6b7785;\\\">Phone</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;\\\"> <a href=\\\"tel:{{ $json.phone }}\\\" style=\\\"color:#1f4fd8;text-decoration:none;\\\">{{ $json.phone }}</a> </td> </tr> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;color:#6b7785;\\\">Company</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;\\\">{{ $json.company }}</td> </tr> <tr> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;color:#6b7785;\\\">Received</td> <td style=\\\"padding:10px 0;border-bottom:1px solid #eef1f4;\\\">{{ DateTime.fromISO($json.received_at, { setZone: true }).toFormat('MMM d, yyyy, h:mm a ZZZZ') }}</td> </tr> <tr> <td style=\\\"padding:10px 0;color:#6b7785;vertical-align:top;\\\">Message</td> <td style=\\\"padding:10px 0;color:#9aa5b1;font-style:italic;\\\">{{ $json.message || 'No message provided' }}</td> </tr> </table> </td> </tr> <tr> <td align=\\\"center\\\" style=\\\"padding:0 32px 32px;\\\"> <a href=\\\"mailto:{{ $json.email }}\\\" style=\\\"display:inline-block;background-color:#1f4fd8;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:6px;\\\">Reply to Lead</a> </td> </tr> <tr> <td style=\\\"background-color:#f9fafb;padding:16px 32px;border-top:1px solid #e3e8ee;\\\"> <p style=\\\"margin:0;font-size:12px;color:#9aa5b1;line-height:18px;\\\"> This is an automated notification. Lead ID: {{ $json.lead_id }} </p> </td> </tr> </table> </td> </tr> </table> </body> </html>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a3354035-f31c-4583-b099-f051e71362f3",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {
+    "Lead Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.yashsarnaik.in",
+            "user-agent": "python-httpx/0.27.2",
+            "content-length": "240",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "2409:40c2:540e:8074:859c:2fa9:32a2:37b2",
+            "cf-ipcountry": "IN",
+            "cf-ray": "a45eb25e3daefd3e-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-warp-tag-id": "c95c960d-39f0-4574-9829-48d595a49972",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "x-forwarded-for": "2409:40c2:540e:8074:859c:2fa9:32a2:37b2",
+            "x-forwarded-proto": "https",
+            "x-webhook-secret": "M@XSOURCE123"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "lead_id": "fd417a8b-8d85-4e57-a181-193eaf72c5d8",
+            "first_name": "Yash",
+            "last_name": "Sarnaik",
+            "email": "yashsarnaik2303@gmail.com",
+            "phone": "+918421811919",
+            "company": "onpoint software services",
+            "message": "hey I want your services"
+          },
+          "webhookUrl": "https://n8n.yashsarnaik.in/webhook/lead",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Secret",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Secret": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Lead": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Success": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "936b5316-82d2-45bd-a275-86cb9611ef5c",
+  "meta": {
+    "instanceId": "2fd675a516250e360379b9d2df614eb04267521d5dd2740f98f1ceed67141bf1"
+  },
+  "nodeGroups": [],
+  "id": "HoHarcRyxzPwAABo",
+  "tags": []
+}

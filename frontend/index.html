@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI Automation Engineer — Technical Assessment Lead Capture Form" />
+  <title>Lead Capture — AI Automation Engineer Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="form-header">
+      <h1>Get in Touch</h1>
+      <p class="subtitle">Fill out the form below and we'll reach out to you shortly.</p>
+    </header>
+
+    <!-- Status banner (success / error) -->
+    <div id="status-banner" class="status-banner hidden" role="status" aria-live="polite"></div>
+
+    <form id="lead-form" novalidate autocomplete="on">
+      <!-- Name row: side-by-side on desktop, stacked on mobile -->
+      <div class="form-row name-row">
+        <div class="form-group">
+          <label for="first_name">First Name <span class="req" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="first_name"
+            name="first_name"
+            autocomplete="given-name"
+            aria-required="true"
+            aria-describedby="first_name-error"
+          />
+          <small class="error" id="first_name-error" role="alert"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Last Name <span class="req" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            autocomplete="family-name"
+            aria-required="true"
+            aria-describedby="last_name-error"
+          />
+          <small class="error" id="last_name-error" role="alert"></small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          autocomplete="email"
+          aria-required="true"
+          aria-describedby="email-error"
+        />
+        <small class="error" id="email-error" role="alert"></small>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone <span class="req" aria-hidden="true">*</span></label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          autocomplete="tel"
+          aria-required="true"
+          aria-describedby="phone-error"
+        />
+        <small class="error" id="phone-error" role="alert"></small>
+      </div>
+
+      <div class="form-group">
+        <label for="company">Company <span class="req" aria-hidden="true">*</span></label>
+        <input
+          type="text"
+          id="company"
+          name="company"
+          autocomplete="organization"
+          aria-required="true"
+          aria-describedby="company-error"
+        />
+        <small class="error" id="company-error" role="alert"></small>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message <span class="optional">(optional)</span></label>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          aria-describedby="message-error"
+        ></textarea>
+        <small class="error" id="message-error" role="alert"></small>
+      </div>
+
+      <button type="submit" id="submit-btn" class="btn-submit">Submit</button>
+    </form>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
